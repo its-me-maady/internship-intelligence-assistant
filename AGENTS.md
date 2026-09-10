@@ -256,8 +256,8 @@ Every code implementation issue MUST be executed in its own isolated Git worktre
 
 ### Directory Structure & Convention
 ```text
-/home/maady/Projects/internship-int/          # Main Repository Root
-/home/maady/Projects/worktrees/              # Isolated Worktrees Directory
+~/Projects/internship-intelligence-assistant/ # Main Repository Root
+~/Projects/worktrees/                         # Isolated Worktrees Directory
 ├── issue-101/                               # Worktree for Issue #101
 ├── issue-102/                               # Worktree for Issue #102
 └── issue-103/                               # Worktree for Issue #103
