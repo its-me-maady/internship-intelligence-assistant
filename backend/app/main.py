@@ -1,5 +1,6 @@
 from app.api.documents import router as documents_router
 from app.config import settings
+from app.services.vector_service import vector_store_service
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -34,7 +35,10 @@ async def health_check():
         "version": settings.APP_VERSION,
         "llm_model": settings.LLM_MODEL,
         "embedding_model": settings.EMBEDDING_MODEL,
+        "embedding_provider": settings.EMBEDDING_PROVIDER,
         "chroma_directory": settings.CHROMA_PERSIST_DIRECTORY,
+        "indexed_documents_count": vector_store_service.get_indexed_documents_count(),
+        "total_chunks_count": vector_store_service.get_total_chunks_count(),
     }
 
 
