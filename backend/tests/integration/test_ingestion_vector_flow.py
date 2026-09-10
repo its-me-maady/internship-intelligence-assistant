@@ -1,14 +1,52 @@
+import hashlib
+from typing import List
+
 from app.main import app
+from app.services.document_service import document_service
+from app.services.vector_service import ChromaVectorStore, EmbeddingService
 from fastapi.testclient import TestClient
 
-client = TestClient(app)
+
+class FakeEmbeddingService(EmbeddingService):
+    """Deterministic offline embedding for integration tests."""
+
+    def __init__(self, dimension: int = 16):
+        self.dimension = dimension
+
+    def _embed(self, text: str) -> List[float]:
+        digest = hashlib.sha256(text.encode("utf-8")).digest()
+        return [
+            float((digest[i % len(digest)] % 100) / 100.0)
+            for i in range(self.dimension)
+        ]
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return [self._embed(t) for t in texts]
+
+    def embed_query(self, text: str) -> List[float]:
+        return self._embed(text)
 
 
-def test_full_upload_embed_and_delete_flow():
+def test_full_upload_embed_and_delete_flow(tmp_path, monkeypatch):
+    test_chroma_dir = str(tmp_path / "integration_chroma")
+    fake_store = ChromaVectorStore(
+        persist_directory=test_chroma_dir,
+        collection_name="test_integration_flow",
+        embedding_service=FakeEmbeddingService(dimension=16),
+    )
+
+    monkeypatch.setattr("app.main.get_vector_store", lambda: fake_store)
+    monkeypatch.setattr(
+        "app.services.document_service.get_vector_store", lambda: fake_store
+    )
+    document_service._vector_store = fake_store
+
+    client = TestClient(app)
+
     # 1. Initial health check
     health_initial = client.get("/health").json()
-    init_docs = health_initial.get("indexed_documents_count", 0)
-    init_chunks = health_initial.get("total_chunks_count", 0)
+    assert health_initial["indexed_documents_count"] == 0
+    assert health_initial["total_chunks_count"] == 0
 
     # 2. Upload a document
     content = (
@@ -27,8 +65,8 @@ def test_full_upload_embed_and_delete_flow():
 
     # 3. Health check reflects new indexed counts
     health_after_upload = client.get("/health").json()
-    assert health_after_upload["indexed_documents_count"] == init_docs + 1
-    assert health_after_upload["total_chunks_count"] == init_chunks + chunk_count
+    assert health_after_upload["indexed_documents_count"] == 1
+    assert health_after_upload["total_chunks_count"] == chunk_count
 
     # 4. Delete document
     delete_res = client.delete(f"/api/v1/documents/{doc_id}")
@@ -37,5 +75,5 @@ def test_full_upload_embed_and_delete_flow():
 
     # 5. Health check reflects reduction in indexed counts
     health_after_delete = client.get("/health").json()
-    assert health_after_delete["indexed_documents_count"] == init_docs
-    assert health_after_delete["total_chunks_count"] == init_chunks
+    assert health_after_delete["indexed_documents_count"] == 0
+    assert health_after_delete["total_chunks_count"] == 0

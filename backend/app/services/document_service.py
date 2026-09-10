@@ -13,7 +13,7 @@ from app.models.document_models import (
 )
 from app.services.chunking_service import ChunkingService
 from app.services.ingestion_service import IngestionService
-from app.services.vector_service import ChromaVectorStore, vector_store_service
+from app.services.vector_service import ChromaVectorStore, get_vector_store
 
 
 class DocumentService:
@@ -32,11 +32,17 @@ class DocumentService:
             max_file_size_mb=settings.MAX_FILE_SIZE_MB
         )
         self.chunking_service = chunking_service or ChunkingService()
-        self.vector_store = vector_store or vector_store_service
+        self._vector_store = vector_store
 
         # In-memory document storage (persisted across service lifespan)
         self._documents: Dict[str, ParsedDocument] = {}
         self._chunks: Dict[str, List[DocumentChunk]] = {}
+
+    @property
+    def vector_store(self) -> ChromaVectorStore:
+        if self._vector_store is not None:
+            return self._vector_store
+        return get_vector_store()
 
     def process_and_store_document(
         self, filename: str, content: bytes

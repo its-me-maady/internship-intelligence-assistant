@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -29,18 +30,24 @@ class LocalMiniLMEmbeddingService(EmbeddingService):
 
     def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
         self.model_name = model_name
-        self._model = TextEmbedding(model_name=self.model_name)
+        self._model: Optional[TextEmbedding] = None
+
+    @property
+    def model(self) -> TextEmbedding:
+        if self._model is None:
+            self._model = TextEmbedding(model_name=self.model_name)
+        return self._model
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         if not texts:
             return []
-        embeddings = list(self._model.embed(texts))
+        embeddings = list(self.model.embed(texts))
         return [e.tolist() for e in embeddings]
 
     def embed_query(self, text: str) -> List[float]:
         if not text:
             return []
-        embeddings = list(self._model.embed([text]))
+        embeddings = list(self.model.embed([text]))
         return embeddings[0].tolist()
 
 
@@ -170,5 +177,7 @@ class ChromaVectorStore:
         return len(doc_ids)
 
 
-# Global singleton instance
-vector_store_service = ChromaVectorStore()
+@lru_cache
+def get_vector_store() -> ChromaVectorStore:
+    """Returns a cached, lazily-initialized ChromaVectorStore instance."""
+    return ChromaVectorStore()

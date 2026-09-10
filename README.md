@@ -79,8 +79,11 @@ Edit `.env`:
 ```env
 GEMINI_API_KEY=your_actual_gemini_api_key
 LLM_MODEL=gemini-1.5-flash
+EMBEDDING_PROVIDER=local
 EMBEDDING_MODEL=models/text-embedding-004
 ```
+
+> **Note on Local Embeddings:** When `EMBEDDING_PROVIDER=local` is selected (default), FastEmbed downloads the `sentence-transformers/all-MiniLM-L6-v2` ONNX model weights (~90MB) on first use. This is a one-time operation, and weights are cached locally for subsequent offline execution.
 
 ---
 

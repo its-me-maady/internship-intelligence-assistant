@@ -1,32 +1,62 @@
+import hashlib
+from typing import List
+
 import pytest
 from app.models.document_models import DocumentChunk
 from app.services.vector_service import (
     ChromaVectorStore,
+    EmbeddingService,
     EmbeddingServiceFactory,
     GeminiEmbeddingService,
     LocalMiniLMEmbeddingService,
 )
 
 
+class FakeEmbeddingService(EmbeddingService):
+    """Deterministic, offline embedding implementation for unit/integration testing."""
+
+    def __init__(self, dimension: int = 16):
+        self.dimension = dimension
+
+    def _embed(self, text: str) -> List[float]:
+        digest = hashlib.sha256(text.encode("utf-8")).digest()
+        return [
+            float((digest[i % len(digest)] % 100) / 100.0)
+            for i in range(self.dimension)
+        ]
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return [self._embed(t) for t in texts]
+
+    def embed_query(self, text: str) -> List[float]:
+        return self._embed(text)
+
+
 class TestEmbeddingServiceAbstraction:
-    """Tests for embedding abstraction factory and local/gemini selection."""
+    """Tests for embedding abstraction factory and provider instantiation."""
 
     def test_factory_creates_local_embedding_service(self):
         service = EmbeddingServiceFactory.get_embedding_service("local")
         assert isinstance(service, LocalMiniLMEmbeddingService)
-        vectors = service.embed_documents(["Software Engineering Intern"])
-        assert len(vectors) == 1
-        assert len(vectors[0]) == 384
+        assert service.model_name == "sentence-transformers/all-MiniLM-L6-v2"
 
     def test_factory_creates_gemini_embedding_service(self):
         service = EmbeddingServiceFactory.get_embedding_service(
             "gemini", api_key="fake-key-for-test"
         )
         assert isinstance(service, GeminiEmbeddingService)
+        assert service.model == "models/text-embedding-004"
 
     def test_factory_raises_for_invalid_provider(self):
         with pytest.raises(ValueError, match="Unsupported embedding provider"):
             EmbeddingServiceFactory.get_embedding_service("invalid_provider")
+
+    def test_fake_embedding_service_is_deterministic(self):
+        fake = FakeEmbeddingService(dimension=8)
+        vec1 = fake.embed_query("Python")
+        vec2 = fake.embed_query("Python")
+        assert vec1 == vec2
+        assert len(vec1) == 8
 
 
 class TestChromaVectorStore:
@@ -35,7 +65,7 @@ class TestChromaVectorStore:
     @pytest.fixture
     def vector_store(self, tmp_path):
         persist_dir = str(tmp_path / "test_chroma")
-        embedding_service = EmbeddingServiceFactory.get_embedding_service("local")
+        embedding_service = FakeEmbeddingService(dimension=16)
         return ChromaVectorStore(
             persist_directory=persist_dir,
             collection_name="test_internship_documents",
