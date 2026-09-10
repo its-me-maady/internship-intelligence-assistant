@@ -1,3 +1,4 @@
+from app.api.documents import router as documents_router
 from app.config import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,6 +20,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount API Routers
+app.include_router(documents_router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["Health"])
