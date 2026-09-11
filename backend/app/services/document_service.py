@@ -110,6 +110,10 @@ class DocumentService:
             chunks=chunks,
         )
 
+    def get_parsed_document(self, document_id: str) -> Optional[ParsedDocument]:
+        """Retrieves raw parsed document entity including full raw text."""
+        return self._documents.get(document_id)
+
     def delete_document(self, document_id: str) -> Optional[DocumentDeleteResponse]:
         """Deletes a document from disk, vector store, and storage registry."""
         if document_id not in self._documents:

@@ -57,6 +57,56 @@ class FakeChatModel(BaseChatModel):
         generation = ChatGeneration(message=AIMessage(content=content))
         return ChatResult(generations=[generation])
 
+    def with_structured_output(self, schema, **kwargs):
+        class StructuredOutputRunnable:
+            def __init__(self, target_schema):
+                self.target_schema = target_schema
+
+            def invoke(self, input_messages, **run_kwargs):
+                fields = getattr(self.target_schema, "model_fields", {})
+                data = {}
+                if "job_title" in fields:
+                    data["job_title"] = "Machine Learning Research Intern"
+                if "company_name" in fields:
+                    data["company_name"] = "Neural Systems Inc."
+                if "location" in fields:
+                    data["location"] = "Mountain View, CA / Hybrid"
+                if "work_type" in fields:
+                    data["work_type"] = "Hybrid"
+                if "stipend_or_salary" in fields:
+                    data["stipend_or_salary"] = "$60 / hour"
+                if "duration_weeks" in fields:
+                    data["duration_weeks"] = 12
+                if "application_deadline" in fields:
+                    data["application_deadline"] = "November 15, 2026"
+                if "required_technical_skills" in fields:
+                    data["required_technical_skills"] = [
+                        "Python",
+                        "PyTorch",
+                        "Transformers",
+                    ]
+                if "preferred_technical_skills" in fields:
+                    data["preferred_technical_skills"] = ["CUDA", "Triton", "Ray"]
+                if "required_soft_skills" in fields:
+                    data["required_soft_skills"] = ["Team communication"]
+                if "minimum_education" in fields:
+                    data["minimum_education"] = "Pursuing MS/PhD in STEM"
+                if "expected_graduation_years" in fields:
+                    data["expected_graduation_years"] = ["2026", "2027"]
+                if "minimum_gpa" in fields:
+                    data["minimum_gpa"] = "3.0"
+                if "prior_experience_required" in fields:
+                    data["prior_experience_required"] = "Research experience"
+                if "key_responsibilities" in fields:
+                    data["key_responsibilities"] = ["Conduct deep learning evaluations"]
+                if "raw_summary" in fields:
+                    data["raw_summary"] = (
+                        "12-week ML research internship on foundation models."
+                    )
+                return self.target_schema(**data)
+
+        return StructuredOutputRunnable(schema)
+
     @property
     def _llm_type(self) -> str:
         return "fake-chat-model"
