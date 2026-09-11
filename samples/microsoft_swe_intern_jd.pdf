@@ -1,0 +1,114 @@
+%PDF-1.3
+%‚„œ”
+1 0 obj
+<<
+/Producer (pypdf)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Count 1
+/Kids [ 4 0 R ]
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Page
+/Resources <<
+/Font <<
+/F1 5 0 R
+>>
+>>
+/MediaBox [ 0.0 0.0 612 792 ]
+/Parent 2 0 R
+/Contents 6 0 R
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+endobj
+6 0 obj
+<<
+/Length 1263
+>>
+stream
+BT
+/F1 11 Tf
+72 720 Td
+15 TL
+(Job Title: Software Engineering Intern - Cloud and AI) Tj
+T*
+(Company: Microsoft Corporation) Tj
+T*
+(Location: Redmond, WA \(Hybrid - 3 days in office\)) Tj
+T*
+(Compensation: $55.00 - $62.00 per hour plus housing stipend) Tj
+T*
+(Duration: 12 weeks \(May 2025 - August 2025\)) Tj
+T*
+(Application Deadline: December 1, 2024) Tj
+T*
+() Tj
+T*
+(Job Overview:) Tj
+T*
+(Join Microsoft Azure AI to build next-generation large language model infrastructure and cloud microservices.) Tj
+T*
+() Tj
+T*
+(Required Qualifications:) Tj
+T*
+(- Pursuing Bachelor of Science or Master of Science in Computer Science or related STEM field) Tj
+T*
+(- Proficiency in C#, C++, Python, or Rust) Tj
+T*
+(- Strong foundation in algorithms, data structures, and distributed systems) Tj
+T*
+(- Experience with Git version control and Linux environments) Tj
+T*
+(- Authorized to work in the US without visa restrictions) Tj
+T*
+() Tj
+T*
+(Preferred Qualifications:) Tj
+T*
+(- Familiarity with Azure cloud services, Docker, or Kubernetes) Tj
+T*
+(- Experience with PyTorch, LangChain, or machine learning frameworks) Tj
+T*
+(- Previous internship in backend or cloud software engineering) Tj
+T*
+(- Experience with RESTful APIs, gRPC, and relational databases \(SQL\)) Tj
+T*
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000015 00000 n 
+0000000054 00000 n 
+0000000113 00000 n 
+0000000162 00000 n 
+0000000294 00000 n 
+0000000364 00000 n 
+trailer
+<<
+/Size 7
+/Root 3 0 R
+/Info 1 0 R
+>>
+startxref
+1679
+%%EOF

@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Internship Intelligence Assistant — Live Demo</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --sidebar-bg: #f1f5f9;
+      --border: #e2e8f0;
+      --border-dark: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .brand-badge {
+      font-size: 11px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid #bfdbfe;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 500;
+      font-size: 12px;
+    }
+    .status-online {
+      background: var(--success-light);
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .status-offline {
+      background: var(--danger-light);
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 61px);
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    aside {
+      width: 330px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .upload-box {
+      border: 2px dashed var(--border-dark);
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: block;
+    }
+
+    .upload-box:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .upload-icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .upload-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .upload-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .doc-list-section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .doc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .doc-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .doc-item:hover {
+      border-color: var(--border-dark);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .doc-item.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    .doc-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .doc-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .doc-item.active .doc-name {
+      color: var(--primary);
+    }
+
+    .doc-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .doc-delete-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+
+    .doc-delete-btn:hover {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .empty-sidebar {
+      text-align: center;
+      padding: 24px 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Main Content */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--card-bg);
+      overflow: hidden;
+    }
+
+    .active-doc-bar {
+      padding: 12px 24px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .active-doc-title {
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--card-bg);
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      flex: 1;
+      overflow-y: auto;
+      display: none;
+      padding: 24px;
+    }
+
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Error Banner */
+    .alert-banner {
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      font-size: 13px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .alert-danger {
+      background: var(--danger-light);
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .alert-warning {
+      background: var(--warning-light);
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: white;
+      border-color: var(--border-dark);
+      color: var(--text);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--sidebar-bg);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Tab 1: Chat Styles */
+    .chat-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .chat-bubble {
+      max-width: 85%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .user-bubble {
+      align-self: flex-end;
+      background: var(--primary);
+      color: white;
+      border-bottom-right-radius: 2px;
+    }
+
+    .assistant-bubble {
+      align-self: flex-start;
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 2px;
+    }
+
+    .assistant-bubble.refusal {
+      background: var(--warning-light);
+      border: 1px solid #fcd34d;
+      color: #78350f;
+    }
+
+    .refusal-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #fde68a;
+      margin-bottom: 8px;
+    }
+
+    .sources-drawer {
+      margin-top: 10px;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      font-size: 12px;
+    }
+
+    .sources-summary {
+      cursor: pointer;
+      color: var(--primary);
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .sources-list {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .source-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    .source-meta {
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .source-snippet {
+      color: var(--text);
+      font-family: monospace;
+      font-size: 11px;
+      background: #f8fafc;
+      padding: 4px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+    }
+
+    .quick-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .prompt-chip {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.15s ease;
+    }
+    .prompt-chip:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .chat-input-bar {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius);
+      font-size: 14px;
+      outline: none;
+    }
+    .chat-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Tab 2: Extraction Styles */
+    .extract-header-card {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .extract-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .extract-company {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .pill-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid var(--border-dark);
+      color: var(--text);
+    }
+
+    .pill-badge.primary {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: #bfdbfe;
+    }
+
+    .pill-badge.success {
+      background: var(--success-light);
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
+    .pill-badge.warning {
+      background: var(--warning-light);
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .pill-badge.danger {
+      background: var(--danger-light);
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .extract-summary-quote {
+      font-style: italic;
+      color: var(--text-muted);
+      border-left: 3px solid var(--primary);
+      padding-left: 12px;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+
+    .extract-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .info-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .info-card-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .info-card-value {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .skill-tag {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .skill-tag.req {
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+    .skill-tag.pref {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .skill-tag.soft {
+      background: #fdf2f8;
+      color: #9d174d;
+      border: 1px solid #fbcfe8;
+    }
+
+    .responsibilities-list {
+      padding-left: 20px;
+      font-size: 13px;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* Tab 3: Match Styles */
+    .match-input-card {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .match-textarea {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 13px;
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius);
+      outline: none;
+      resize: vertical;
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+    .match-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .score-overview {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .score-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      border: 4px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .score-number {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .score-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .score-details {
+      flex: 1;
+    }
+
+    .formula-box {
+      font-family: monospace;
+      font-size: 12px;
+      background: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      margin-top: 8px;
+      color: var(--text-muted);
+    }
+
+    .match-buckets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .bucket-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .bucket-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .roadmap-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      list-style: none;
+    }
+
+    .roadmap-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .priority-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .roadmap-content {
+      flex: 1;
+    }
+
+    .roadmap-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .roadmap-skill {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .roadmap-focus {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      border-left-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .thinking-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 8px 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">IIA</div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="brand-title">Internship Intelligence Assistant</span>
+          <span class="brand-badge">Academic Demo</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-status">
+      <span id="backendStatus" class="status-pill status-offline">
+        <span class="dot"></span> Checking Backend...
+      </span>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+
+    <!-- Left Sidebar: Documents -->
+    <aside>
+      <div class="sidebar-header">
+        <label class="upload-box" for="fileInput" id="uploadBox">
+          <div class="upload-icon">📄</div>
+          <div class="upload-label" id="uploadLabelText">Upload Job Description</div>
+          <div class="upload-sub">PDF, DOCX, TXT, or MD (max 15MB)</div>
+          <input type="file" id="fileInput" style="display: none;" accept=".pdf,.docx,.txt,.md" />
+        </label>
+        <div id="sidebarError" class="alert-banner alert-danger" style="margin-top: 10px; margin-bottom: 0;"></div>
+      </div>
+
+      <div class="doc-list-section">
+        <div class="section-title">
+          <span>Uploaded Documents</span>
+          <span id="docCountBadge" class="brand-badge">0</span>
+        </div>
+        <ul class="doc-list" id="documentList">
+          <!-- Populated by JS -->
+        </ul>
+        <div id="emptyDocMessage" class="empty-sidebar">
+          No documents uploaded yet.<br>Click the box above to upload a sample JD.
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      <!-- Active Document Banner -->
+      <div class="active-doc-bar">
+        <div class="active-doc-title">
+          <span>Active Document:</span>
+          <span id="activeDocName" style="color: var(--primary); font-weight: 700;">None Selected</span>
+        </div>
+        <div id="fastPathIndicator" class="pill-badge" style="display: none;">
+          ⚡ Extraction Cached
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('chat')">💬 Grounded Chat</button>
+        <button class="tab-btn" onclick="switchTab('extract')">📋 Structured Extract</button>
+        <button class="tab-btn" onclick="switchTab('match')">🎯 Skill Match & Roadmap</button>
+      </div>
+
+      <!-- TAB 1: Grounded Conversational RAG Chat -->
+      <div id="tab-chat" class="tab-content active">
+        <div class="chat-layout">
+          <div id="chatError" class="alert-banner alert-danger"></div>
+
+          <div class="quick-prompts" id="quickPromptsContainer">
+            <span style="font-size: 12px; color: var(--text-muted); align-self: center;">Suggested queries:</span>
+            <button class="prompt-chip" onclick="setChatQuery('What are the mandatory qualifications and technical skills?')">Mandatory skills</button>
+            <button class="prompt-chip" onclick="setChatQuery('What is the compensation and work arrangement location?')">Compensation & location</button>
+            <button class="prompt-chip" onclick="setChatQuery('Does this posting offer full-time H1B visa sponsorship upon graduation?')">Test Refusal Guardrail</button>
+          </div>
+
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-bubble assistant-bubble">
+              👋 Hello! Select an uploaded internship posting from the left sidebar and ask any question. My answers are strictly grounded in the document context with verified citations.
+            </div>
+          </div>
+
+          <div id="chatThinking" class="thinking-box" style="display: none;">
+            <div class="spinner"></div>
+            <span>Synthesizing grounded answer with Gemini RAG... (typically 10-30s)</span>
+          </div>
+
+          <form class="chat-input-bar" onsubmit="handleSendChat(event)">
+            <input type="text" id="chatQueryInput" class="chat-input" placeholder="Ask a question about the selected internship posting..." />
+            <button type="submit" id="chatSendBtn" class="btn btn-primary">Send</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 2: Structured Extraction -->
+      <div id="tab-extract" class="tab-content">
+        <div id="extractError" class="alert-banner alert-danger"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <h3 style="font-size: 16px; font-weight: 700;">Structured Requirement Extraction</h3>
+            <p style="font-size: 13px; color: var(--text-muted);">Extracts standardized fields (skills, compensation, deadlines) via Gemini structured output.</p>
+          </div>
+          <button id="extractBtn" class="btn btn-primary" onclick="handleExtractRequirements()">
+            <span>Extract Structured Data</span>
+          </button>
+        </div>
+
+        <div id="extractThinking" class="thinking-box" style="display: none; margin-bottom: 16px;">
+          <div class="spinner"></div>
+          <span>Extracting structured parameters with Gemini... (typically 15-30s)</span>
+        </div>
+
+        <div id="extractResultsContainer" style="display: none;">
+          <!-- Executive Header Card -->
+          <div class="extract-header-card">
+            <div class="extract-title" id="extJobTitle">-</div>
+            <div class="extract-company" id="extCompany">-</div>
+            <div class="badge-row">
+              <span class="pill-badge primary" id="extWorkType">Hybrid</span>
+              <span class="pill-badge" id="extLocation">Location</span>
+              <span class="pill-badge success" id="extDuration">12 Weeks</span>
+            </div>
+            <div class="extract-summary-quote" id="extSummary">-</div>
+          </div>
+
+          <!-- Key Details Grid -->
+          <div class="extract-grid">
+            <div class="info-card">
+              <div class="info-card-title">💰 Compensation & Stipend</div>
+              <div class="info-card-value" id="extStipend">-</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">📅 Application Deadline</div>
+              <div class="info-card-value" id="extDeadline">-</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">🎓 Education & Graduation</div>
+              <div class="info-card-value" id="extEducation">-</div>
+            </div>
+          </div>
+
+          <!-- Skills Cards -->
+          <div class="extract-grid">
+            <div class="info-card">
+              <div class="info-card-title">Mandatory Required Skills</div>
+              <div class="skill-tags" id="extReqSkills"></div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">Preferred / Bonus Skills</div>
+              <div class="skill-tags" id="extPrefSkills"></div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">Required Soft Skills</div>
+              <div class="skill-tags" id="extSoftSkills"></div>
+            </div>
+          </div>
+
+          <!-- Responsibilities Card -->
+          <div class="info-card" style="margin-top: 16px;">
+            <div class="info-card-title">Key Responsibilities</div>
+            <ul class="responsibilities-list" id="extResponsibilities"></ul>
+          </div>
+        </div>
+
+        <div id="extractEmptyState" class="empty-sidebar" style="margin-top: 40px;">
+          Click "Extract Structured Data" above to parse the selected document into standardized requirements.
+        </div>
+      </div>
+
+      <!-- TAB 3: Skill Gap Analysis & Roadmap -->
+      <div id="tab-match" class="tab-content">
+        <div id="matchError" class="alert-banner alert-danger"></div>
+
+        <div class="match-input-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label style="font-size: 13px; font-weight: 700; color: var(--text);">Candidate Technical Skills (comma-separated):</label>
+            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="loadSampleCandidateSkills()">
+              Load Demo Skills
+            </button>
+          </div>
+          <textarea id="candidateSkillsInput" class="match-textarea" placeholder="e.g. Python, Java, Git, Linux, PostgreSQL, Docker, AWS, React, TypeScript"></textarea>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span id="matchFastPathNotice" style="font-size: 12px; color: var(--text-muted);">
+              ℹ️ Will use fast 0-LLM scoring if requirements were extracted in Tab 2.
+            </span>
+            <button id="matchBtn" class="btn btn-primary" onclick="handleAnalyzeSkillGap()">
+              <span>Analyze Match & Roadmap</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="matchThinking" class="thinking-box" style="display: none; margin-bottom: 16px;">
+          <div class="spinner"></div>
+          <span>Executing skill matching analysis...</span>
+        </div>
+
+        <div id="matchResultsContainer" style="display: none;">
+          <!-- Score Card -->
+          <div class="score-overview">
+            <div class="score-circle">
+              <div class="score-number" id="matchScoreNum">0%</div>
+              <div class="score-label">Match Score</div>
+            </div>
+            <div class="score-details">
+              <h3 style="font-size: 16px; font-weight: 700;">Deterministic Match Analysis</h3>
+              <p style="font-size: 13px; color: var(--text-muted);" id="matchScoreFormulaDesc">
+                Calculated via 70% required skills weight + 30% preferred skills weight.
+              </p>
+              <div class="formula-box" id="matchFormulaBox">-</div>
+            </div>
+          </div>
+
+          <!-- 4 Skill Buckets -->
+          <div class="match-buckets-grid">
+            <div class="bucket-card">
+              <div class="bucket-title" style="color: #065f46;">
+                <span>✅ Matched Required</span>
+                <span id="badgeMatchedReq" class="pill-badge success">0</span>
+              </div>
+              <div class="skill-tags" id="listMatchedReq"></div>
+            </div>
+
+            <div class="bucket-card">
+              <div class="bucket-title" style="color: #991b1b;">
+                <span>⚠️ Missing Required (Critical)</span>
+                <span id="badgeMissingReq" class="pill-badge danger">0</span>
+              </div>
+              <div class="skill-tags" id="listMissingReq"></div>
+            </div>
+
+            <div class="bucket-card">
+              <div class="bucket-title" style="color: #1e40af;">
+                <span>⭐ Matched Preferred</span>
+                <span id="badgeMatchedPref" class="pill-badge primary">0</span>
+              </div>
+              <div class="skill-tags" id="listMatchedPref"></div>
+            </div>
+
+            <div class="bucket-card">
+              <div class="bucket-title" style="color: #92400e;">
+                <span>💡 Missing Preferred</span>
+                <span id="badgeMissingPref" class="pill-badge warning">0</span>
+              </div>
+              <div class="skill-tags" id="listMissingPref"></div>
+            </div>
+          </div>
+
+          <!-- Roadmap Section -->
+          <div class="info-card">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 14px;">Prioritized Learning Roadmap</h3>
+            <ul class="roadmap-list" id="roadmapList">
+              <!-- Populated by JS -->
+            </ul>
+          </div>
+        </div>
+
+        <div id="matchEmptyState" class="empty-sidebar" style="margin-top: 40px;">
+          Enter candidate skills and click "Analyze Match & Roadmap" to evaluate compatibility.
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:8000";
+
+    // Application State
+    let documents = [];
+    let selectedDocumentId = null;
+    let extractedCache = {}; // document_id -> JobRequirementsSchema
+
+    // Initialize application on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      checkBackendHealth();
+      fetchDocuments();
+      setupFileInput();
+    });
+
+    // Health check
+    async function checkBackendHealth() {
+      const statusEl = document.getElementById("backendStatus");
+      try {
+        const res = await fetch(`${API_BASE}/health`);
+        if (res.ok) {
+          const data = await res.json();
+          statusEl.className = "status-pill status-online";
+          statusEl.innerHTML = `<span class="dot"></span> Backend Online (${data.llm_model})`;
+        } else {
+          throw new Error("Status " + res.status);
+        }
+      } catch (err) {
+        statusEl.className = "status-pill status-offline";
+        statusEl.innerHTML = `<span class="dot"></span> Backend Offline (Port 8000)`;
+      }
+    }
+
+    // Switch Tabs
+    function switchTab(tabName) {
+      document.querySelectorAll(".tab-btn").forEach((btn, index) => {
+        btn.classList.remove("active");
+        if (
+          (tabName === "chat" && index === 0) ||
+          (tabName === "extract" && index === 1) ||
+          (tabName === "match" && index === 2)
+        ) {
+          btn.classList.add("active");
+        }
+      });
+
+      document.querySelectorAll(".tab-content").forEach(content => {
+        content.classList.remove("active");
+      });
+      document.getElementById(`tab-${tabName}`).classList.add("active");
+
+      // Update Fast-Path Notice in Match Tab
+      if (tabName === "match") {
+        updateMatchTabNotice();
+      }
+    }
+
+    function updateMatchTabNotice() {
+      const noticeEl = document.getElementById("matchFastPathNotice");
+      if (selectedDocumentId && extractedCache[selectedDocumentId]) {
+        noticeEl.innerHTML = "⚡ <strong>Fast Path Ready:</strong> 0-LLM sub-millisecond evaluation enabled using cached extraction.";
+        noticeEl.style.color = "#059669";
+      } else {
+        noticeEl.innerHTML = "ℹ️ Fast path available once requirements are extracted in Tab 2.";
+        noticeEl.style.color = "var(--text-muted)";
+      }
+    }
+
+    // Fetch and render documents
+    async function fetchDocuments() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/documents`);
+        if (!res.ok) throw new Error("Failed to load documents");
+        documents = await res.json();
+        renderDocumentList();
+      } catch (err) {
+        showSidebarError("Unable to fetch documents from server.");
+      }
+    }
+
+    function renderDocumentList() {
+      const listEl = document.getElementById("documentList");
+      const emptyEl = document.getElementById("emptyDocMessage");
+      const countEl = document.getElementById("docCountBadge");
+
+      listEl.innerHTML = "";
+      countEl.textContent = documents.length;
+
+      if (documents.length === 0) {
+        emptyEl.style.display = "block";
+        setSelectedDocument(null);
+        return;
+      }
+
+      emptyEl.style.display = "none";
+
+      documents.forEach(doc => {
+        const li = document.createElement("li");
+        li.className = `doc-item ${doc.document_id === selectedDocumentId ? "active" : ""}`;
+        li.onclick = (e) => {
+          if (!e.target.classList.contains("doc-delete-btn")) {
+            setSelectedDocument(doc.document_id);
+          }
+        };
+
+        const sizeKb = (doc.file_size_bytes / 1024).toFixed(1);
+
+        li.innerHTML = `
+          <div class="doc-info">
+            <div class="doc-name" title="${escapeHtml(doc.filename)}">📄 ${escapeHtml(doc.filename)}</div>
+            <div class="doc-meta">
+              <span>${sizeKb} KB</span>
+              <span>•</span>
+              <span>${doc.chunk_count || 0} chunks</span>
+            </div>
+          </div>
+          <button class="doc-delete-btn" title="Delete Document" onclick="handleDeleteDocument('${doc.document_id}', event)">×</button>
+        `;
+
+        listEl.appendChild(li);
+      });
+
+      // Auto-select first document if none selected
+      if (!selectedDocumentId && documents.length > 0) {
+        setSelectedDocument(documents[0].document_id);
+      }
+    }
+
+    function setSelectedDocument(docId) {
+      selectedDocumentId = docId;
+      const activeDoc = documents.find(d => d.document_id === docId);
+      const nameEl = document.getElementById("activeDocName");
+      const fastPathEl = document.getElementById("fastPathIndicator");
+
+      if (activeDoc) {
+        nameEl.textContent = activeDoc.filename;
+        nameEl.title = `ID: ${activeDoc.document_id}`;
+      } else {
+        nameEl.textContent = "None Selected";
+        nameEl.title = "";
+      }
+
+      if (docId && extractedCache[docId]) {
+        fastPathEl.style.display = "inline-block";
+        renderExtractedView(extractedCache[docId]);
+      } else {
+        fastPathEl.style.display = "none";
+        document.getElementById("extractResultsContainer").style.display = "none";
+        document.getElementById("extractEmptyState").style.display = "block";
+      }
+
+      renderDocumentList();
+      updateMatchTabNotice();
+    }
+
+    // File Upload Setup
+    function setupFileInput() {
+      const fileInput = document.getElementById("fileInput");
+      fileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const uploadLabel = document.getElementById("uploadLabelText");
+        uploadLabel.innerHTML = `<div class="spinner"></div> Uploading & Indexing...`;
+
+        try {
+          const res = await fetch(`${API_BASE}/api/v1/documents/upload`, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.detail || "Upload failed");
+          }
+
+          const newDoc = await res.json();
+          fileInput.value = "";
+          await fetchDocuments();
+          setSelectedDocument(newDoc.document_id);
+          clearSidebarError();
+        } catch (err) {
+          showSidebarError(`Upload error: ${err.message}`);
+        } finally {
+          uploadLabel.textContent = "Upload Job Description";
+        }
+      });
+    }
+
+    // Delete Document
+    async function handleDeleteDocument(docId, event) {
+      event.stopPropagation();
+      if (!confirm("Are you sure you want to delete this document?")) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/documents/${docId}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error("Deletion failed");
+
+        delete extractedCache[docId];
+        await fetchDocuments();
+        if (selectedDocumentId === docId) {
+          setSelectedDocument(documents.length > 0 ? documents[0].document_id : null);
+        }
+      } catch (err) {
+        showSidebarError(`Delete failed: ${err.message}`);
+      }
+    }
+
+    // TAB 1: Chat Handler
+    async function handleSendChat(event) {
+      event.preventDefault();
+      const inputEl = document.getElementById("chatQueryInput");
+      const query = inputEl.value.trim();
+      if (!query) return;
+
+      if (!selectedDocumentId) {
+        showChatError("Please select or upload a document from the left sidebar first.");
+        return;
+      }
+
+      clearChatError();
+      appendUserMessage(query);
+      inputEl.value = "";
+
+      const thinkingEl = document.getElementById("chatThinking");
+      const sendBtn = document.getElementById("chatSendBtn");
+      thinkingEl.style.display = "flex";
+      sendBtn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: query,
+            document_id: selectedDocumentId,
+          }),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `Server returned status ${res.status}`);
+        }
+
+        const data = await res.json();
+        appendAssistantMessage(data);
+      } catch (err) {
+        showChatError(`Chat error: ${err.message}`);
+      } finally {
+        thinkingEl.style.display = "none";
+        sendBtn.disabled = false;
+      }
+    }
+
+    function setChatQuery(text) {
+      const inputEl = document.getElementById("chatQueryInput");
+      inputEl.value = text;
+      inputEl.focus();
+    }
+
+    function appendUserMessage(text) {
+      const container = document.getElementById("chatMessages");
+      const bubble = document.createElement("div");
+      bubble.className = "chat-bubble user-bubble";
+      bubble.textContent = text;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function appendAssistantMessage(data) {
+      const container = document.getElementById("chatMessages");
+      const bubble = document.createElement("div");
+      const isRefusal = data.is_grounded === false;
+      bubble.className = `chat-bubble assistant-bubble ${isRefusal ? "refusal" : ""}`;
+
+      let contentHtml = "";
+      if (isRefusal) {
+        contentHtml += `<div class="refusal-badge">🛡️ Refusal Guardrail Triggered</div>`;
+      }
+      contentHtml += `<div>${escapeHtml(data.answer)}</div>`;
+
+      // Citations / Sources Drawer
+      if (data.sources && data.sources.length > 0) {
+        contentHtml += `
+          <div class="sources-drawer">
+            <details>
+              <summary class="sources-summary">📑 Verified Sources (${data.sources.length} chunks)</summary>
+              <ul class="sources-list">
+                ${data.sources.map(s => `
+                  <li class="source-card">
+                    <div class="source-meta">Page ${s.page_number || 1} • Chunk ${s.chunk_index} • ${escapeHtml(s.filename)}</div>
+                    <div class="source-snippet">${escapeHtml(s.snippet)}</div>
+                  </li>
+                `).join("")}
+              </ul>
+            </details>
+          </div>
+        `;
+      }
+
+      bubble.innerHTML = contentHtml;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // TAB 2: Structured Extraction Handler
+    async function handleExtractRequirements() {
+      if (!selectedDocumentId) {
+        showExtractError("Please select a document first.");
+        return;
+      }
+
+      clearExtractError();
+      const thinkingEl = document.getElementById("extractThinking");
+      const btn = document.getElementById("extractBtn");
+      thinkingEl.style.display = "flex";
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/analysis/extract/${selectedDocumentId}`, {
+          method: "POST",
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || "Extraction failed");
+        }
+
+        const data = await res.json();
+        extractedCache[selectedDocumentId] = data;
+        document.getElementById("fastPathIndicator").style.display = "inline-block";
+        renderExtractedView(data);
+        updateMatchTabNotice();
+      } catch (err) {
+        showExtractError(`Extraction error: ${err.message}`);
+      } finally {
+        thinkingEl.style.display = "none";
+        btn.disabled = false;
+      }
+    }
+
+    function renderExtractedView(data) {
+      document.getElementById("extractEmptyState").style.display = "none";
+      document.getElementById("extractResultsContainer").style.display = "block";
+
+      document.getElementById("extJobTitle").textContent = data.job_title || "Job Title Not Specified";
+      document.getElementById("extCompany").textContent = data.company_name || "Company Not Specified";
+      document.getElementById("extWorkType").textContent = data.work_type || "Standard";
+      document.getElementById("extLocation").textContent = data.location || "Location Flexible";
+      document.getElementById("extDuration").textContent = data.duration_weeks ? `${data.duration_weeks} Weeks` : "Duration N/A";
+      document.getElementById("extSummary").textContent = `"${data.raw_summary || "No executive summary available."}"`;
+
+      document.getElementById("extStipend").textContent = data.stipend_or_salary || "Not Disclosed in Posting";
+      document.getElementById("extDeadline").textContent = data.application_deadline || "Rolling / Unspecified";
+      document.getElementById("extEducation").textContent = `${data.minimum_education || "Relevant Degree"} (Grad: ${data.expected_graduation_years?.join(", ") || "Open"})`;
+
+      renderTags("extReqSkills", data.required_technical_skills, "req");
+      renderTags("extPrefSkills", data.preferred_technical_skills, "pref");
+      renderTags("extSoftSkills", data.required_soft_skills, "soft");
+
+      const respList = document.getElementById("extResponsibilities");
+      respList.innerHTML = (data.key_responsibilities || []).map(r => `<li>${escapeHtml(r)}</li>`).join("") || "<li>None specified</li>";
+    }
+
+    function renderTags(containerId, tags, typeClass) {
+      const container = document.getElementById(containerId);
+      if (!tags || tags.length === 0) {
+        container.innerHTML = `<span style="font-size: 12px; color: var(--text-muted);">None listed</span>`;
+        return;
+      }
+      container.innerHTML = tags.map(t => `<span class="skill-tag ${typeClass}">${escapeHtml(t)}</span>`).join("");
+    }
+
+    // TAB 3: Skill Gap & Matching Handler
+    function loadSampleCandidateSkills() {
+      const skills = "py, Java, git, linux, postgres, k8s, gcp, ts, FastAPI, Rust";
+      document.getElementById("candidateSkillsInput").value = skills;
+    }
+
+    async function handleAnalyzeSkillGap() {
+      if (!selectedDocumentId) {
+        showMatchError("Please select a document first.");
+        return;
+      }
+
+      const inputVal = document.getElementById("candidateSkillsInput").value.trim();
+      const userSkills = inputVal.split(",").map(s => s.trim()).filter(Boolean);
+
+      if (userSkills.length === 0) {
+        showMatchError("Please enter at least one candidate skill.");
+        return;
+      }
+
+      clearMatchError();
+      const thinkingEl = document.getElementById("matchThinking");
+      const btn = document.getElementById("matchBtn");
+      thinkingEl.style.display = "flex";
+      btn.disabled = true;
+
+      const payload = {
+        document_id: selectedDocumentId,
+        user_skills: userSkills,
+      };
+
+      // Fast-Path: pass pre-extracted data if available
+      if (extractedCache[selectedDocumentId]) {
+        payload.extracted_requirements = extractedCache[selectedDocumentId];
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/analysis/skill-gap`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || "Skill gap analysis failed");
+        }
+
+        const data = await res.json();
+        renderMatchResults(data);
+      } catch (err) {
+        showMatchError(`Analysis error: ${err.message}`);
+      } finally {
+        thinkingEl.style.display = "none";
+        btn.disabled = false;
+      }
+    }
+
+    function renderMatchResults(data) {
+      document.getElementById("matchEmptyState").style.display = "none";
+      document.getElementById("matchResultsContainer").style.display = "block";
+
+      document.getElementById("matchScoreNum").textContent = `${data.match_score_percentage}%`;
+      document.getElementById("matchFormulaBox").textContent = data.score_breakdown?.formula || "Formula computation complete.";
+
+      // Buckets
+      renderBucketList("listMatchedReq", "badgeMatchedReq", data.matched_required_skills, "req");
+      renderBucketList("listMissingReq", "badgeMissingReq", data.missing_required_skills, "danger");
+      renderBucketList("listMatchedPref", "badgeMatchedPref", data.matched_preferred_skills, "pref");
+      renderBucketList("listMissingPref", "badgeMissingPref", data.missing_preferred_skills, "warning");
+
+      // Roadmap
+      const roadmapEl = document.getElementById("roadmapList");
+      if (!data.priority_learning_roadmap || data.priority_learning_roadmap.length === 0) {
+        roadmapEl.innerHTML = `<li class="roadmap-item" style="color: var(--success); font-weight: 600;">🎉 Candidate satisfies all requirements! No critical gaps identified.</li>`;
+        return;
+      }
+
+      roadmapEl.innerHTML = data.priority_learning_roadmap.map(item => `
+        <li class="roadmap-item">
+          <div class="priority-badge">${item.priority}</div>
+          <div class="roadmap-content">
+            <div class="roadmap-header">
+              <span class="roadmap-skill">${escapeHtml(item.skill)}</span>
+              <span class="pill-badge ${item.category.includes('Critical') ? 'danger' : 'warning'}">${escapeHtml(item.category)}</span>
+              <span class="pill-badge">⏱️ ~${item.estimated_study_hours} hrs</span>
+            </div>
+            <div class="roadmap-focus"><strong>Recommended Focus:</strong> ${escapeHtml(item.recommended_focus)}</div>
+          </div>
+        </li>
+      `).join("");
+    }
+
+    function renderBucketList(containerId, badgeId, items, typeClass) {
+      const container = document.getElementById(containerId);
+      const badge = document.getElementById(badgeId);
+      const count = items ? items.length : 0;
+      badge.textContent = count;
+
+      if (count === 0) {
+        container.innerHTML = `<span style="font-size: 12px; color: var(--text-muted);">None</span>`;
+        return;
+      }
+
+      let tagClass = "req";
+      if (typeClass === "danger") tagClass = "pill-badge danger";
+      else if (typeClass === "pref") tagClass = "skill-tag pref";
+      else if (typeClass === "warning") tagClass = "pill-badge warning";
+      else tagClass = "skill-tag req";
+
+      container.innerHTML = items.map(item => `<span class="${tagClass}">${escapeHtml(item)}</span>`).join("");
+    }
+
+    // Helper Alert Functions
+    function showSidebarError(msg) {
+      const el = document.getElementById("sidebarError");
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+    function clearSidebarError() {
+      document.getElementById("sidebarError").style.display = "none";
+    }
+
+    function showChatError(msg) {
+      const el = document.getElementById("chatError");
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+    function clearChatError() {
+      document.getElementById("chatError").style.display = "none";
+    }
+
+    function showExtractError(msg) {
+      const el = document.getElementById("extractError");
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+    function clearExtractError() {
+      document.getElementById("extractError").style.display = "none";
+    }
+
+    function showMatchError(msg) {
+      const el = document.getElementById("matchError");
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+    function clearMatchError() {
+      document.getElementById("matchError").style.display = "none";
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

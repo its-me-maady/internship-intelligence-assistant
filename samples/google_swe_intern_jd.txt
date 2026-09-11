@@ -1,0 +1,36 @@
+Job Title: Software Engineering Intern, Summer 2025
+Company: Google LLC
+Location: Mountain View, CA; New York, NY; Seattle, WA (Hybrid - 3 days in office, 2 days remote)
+Duration: 12-14 weeks (May - August 2025 or June - September 2025)
+Compensation: $54.00 - $62.00 per hour plus housing stipend and relocation assistance
+Application Deadline: October 31, 2024
+
+About the Role:
+Google is seeking ambitious Software Engineering Interns to join our core engineering teams for Summer 2025. As an intern, you will work on core Google products including Search, Cloud, YouTube, and Android, writing production-level code, designing scalable backend systems, and collaborating with cross-functional product managers, designers, and site reliability engineers.
+
+Key Responsibilities:
+- Design, develop, test, deploy, maintain, and enhance software solutions across distributed systems.
+- Build and optimize high-throughput RESTful and gRPC microservices serving millions of queries per second.
+- Implement reliable unit, integration, and end-to-end tests using automated CI/CD pipelines.
+- Collaborate with tech leads and mentors in bi-weekly sprint planning and architecture reviews.
+- Participate in code reviews and adhere to Google's engineering quality standards.
+
+Minimum Qualifications (Required):
+- Currently enrolled in an accredited Bachelor's or Master's degree program in Computer Science, Computer Engineering, Software Engineering, or related technical field with an anticipated graduation date between December 2025 and August 2026.
+- Experience programming in one or more general-purpose languages: Python, C++, Java, or Go.
+- Solid foundational understanding of Data Structures, Algorithms, and Object-Oriented Programming (OOP).
+- Experience working with Git version control and Linux/Unix command-line environments.
+- Authorized to work in the United States without visa sponsorship restrictions.
+
+Preferred Qualifications (Bonus):
+- Previous technical internship experience in software development or research lab assistantship.
+- Experience building distributed cloud applications using Google Cloud Platform (GCP), AWS, or Kubernetes.
+- Familiarity with relational databases (PostgreSQL, MySQL) and NoSQL stores (Redis, Spanner).
+- Familiarity with frontend frameworks like React or Angular, or TypeScript.
+- Contributions to open-source software projects or competitive programming achievements.
+
+Benefits & Perks:
+- Competitive hourly salary with 401(k) retirement plan matching.
+- Comprehensive health, dental, and vision insurance coverage.
+- Free gourmet breakfast, lunch, and dinner on campus.
+- Dedicated 1-on-1 engineering mentorship and intern speaker series with executive leaders.
