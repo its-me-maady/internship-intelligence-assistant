@@ -1,9 +1,12 @@
 import hashlib
-from typing import List
+from typing import Any, List
 
 import pytest
 from app.services.document_service import document_service
 from app.services.vector_service import ChromaVectorStore, EmbeddingService
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import AIMessage, BaseMessage
+from langchain_core.outputs import ChatGeneration, ChatResult
 
 
 class FakeEmbeddingService(EmbeddingService):
@@ -26,9 +29,47 @@ class FakeEmbeddingService(EmbeddingService):
         return self._embed(text)
 
 
+class FakeChatModel(BaseChatModel):
+    """Deterministic, offline Fake Chat Model for testing."""
+
+    response_text: str = (
+        "According to [Source: doc.pdf, Page: 1], the requirements are verified."
+    )
+
+    def _generate(
+        self,
+        messages: List[BaseMessage],
+        stop: Any = None,
+        run_manager: Any = None,
+        **kwargs: Any,
+    ) -> ChatResult:
+        prompt_content = "\n".join(str(m.content) for m in messages)
+        if (
+            "favorite food" in prompt_content.lower()
+            or "ceo salary" in prompt_content.lower()
+        ):
+            content = (
+                "I cannot find sufficient information in the uploaded "
+                "internship document(s) to answer this question accurately."
+            )
+        else:
+            content = self.response_text
+        generation = ChatGeneration(message=AIMessage(content=content))
+        return ChatResult(generations=[generation])
+
+    @property
+    def _llm_type(self) -> str:
+        return "fake-chat-model"
+
+
 @pytest.fixture
 def fake_embedding_service() -> FakeEmbeddingService:
     return FakeEmbeddingService(dimension=16)
+
+
+@pytest.fixture
+def fake_chat_model() -> FakeChatModel:
+    return FakeChatModel()
 
 
 @pytest.fixture(autouse=True)
@@ -56,3 +97,11 @@ def mock_vector_store(tmp_path, monkeypatch):
     monkeypatch.setattr(document_service, "_chunks", {})
 
     return fake_store
+
+
+@pytest.fixture(autouse=True)
+def mock_llm_service(monkeypatch):
+    """Autouse fixture providing an offline FakeChatModel for all tests."""
+    fake_llm = FakeChatModel()
+    monkeypatch.setattr("app.services.llm_service.get_llm", lambda: fake_llm)
+    return fake_llm
