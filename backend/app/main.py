@@ -1,5 +1,6 @@
 from app.api.documents import router as documents_router
 from app.config import settings
+from app.services.vector_service import get_vector_store
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -28,13 +29,17 @@ app.include_router(documents_router, prefix="/api/v1")
 @app.get("/health", tags=["Health"])
 async def health_check():
     """Health check endpoint to verify backend operational readiness."""
+    vector_store = get_vector_store()
     return {
         "status": "healthy",
         "app_name": settings.APP_NAME,
         "version": settings.APP_VERSION,
         "llm_model": settings.LLM_MODEL,
         "embedding_model": settings.EMBEDDING_MODEL,
+        "embedding_provider": settings.EMBEDDING_PROVIDER,
         "chroma_directory": settings.CHROMA_PERSIST_DIRECTORY,
+        "indexed_documents_count": vector_store.get_indexed_documents_count(),
+        "total_chunks_count": vector_store.get_total_chunks_count(),
     }
 
 

@@ -20,12 +20,14 @@ class Settings(BaseSettings):
     # AI & Embeddings
     GEMINI_API_KEY: str = ""
     LLM_MODEL: str = "gemini-1.5-flash"
+    EMBEDDING_PROVIDER: str = "local"  # "local" (FastEmbed/MiniLM) or "gemini"
     EMBEDDING_MODEL: str = "models/text-embedding-004"
 
     # Storage & ChromaDB
     CHROMA_PERSIST_DIRECTORY: str = str(
         Path(__file__).resolve().parent.parent.parent / "data" / "chroma"
     )
+    CHROMA_COLLECTION_NAME: str = "internship_documents"
     UPLOAD_DIRECTORY: str = str(
         Path(__file__).resolve().parent.parent.parent / "data" / "uploads"
     )

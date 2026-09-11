@@ -13,16 +13,18 @@ from app.models.document_models import (
 )
 from app.services.chunking_service import ChunkingService
 from app.services.ingestion_service import IngestionService
+from app.services.vector_service import ChromaVectorStore, get_vector_store
 
 
 class DocumentService:
-    """Coordinates document ingestion, chunking, and metadata storage."""
+    """Coordinates document ingestion, chunking, and vector storage."""
 
     def __init__(
         self,
         upload_dir: Optional[str] = None,
         ingestion_service: Optional[IngestionService] = None,
         chunking_service: Optional[ChunkingService] = None,
+        vector_store: Optional[ChromaVectorStore] = None,
     ):
         self.upload_dir = Path(upload_dir or settings.UPLOAD_DIRECTORY)
         self.upload_dir.mkdir(parents=True, exist_ok=True)
@@ -30,10 +32,17 @@ class DocumentService:
             max_file_size_mb=settings.MAX_FILE_SIZE_MB
         )
         self.chunking_service = chunking_service or ChunkingService()
+        self._vector_store = vector_store
 
         # In-memory document storage (persisted across service lifespan)
         self._documents: Dict[str, ParsedDocument] = {}
         self._chunks: Dict[str, List[DocumentChunk]] = {}
+
+    @property
+    def vector_store(self) -> ChromaVectorStore:
+        if self._vector_store is not None:
+            return self._vector_store
+        return get_vector_store()
 
     def process_and_store_document(
         self, filename: str, content: bytes
@@ -50,9 +59,10 @@ class DocumentService:
         with open(file_path, "wb") as f:
             f.write(content)
 
-        # Store in registry
+        # Store in registry and vector store
         self._documents[doc_id] = parsed_doc
         self._chunks[doc_id] = chunks
+        self.vector_store.add_chunks(chunks)
 
         return DocumentUploadResponse(
             document_id=doc_id,
@@ -101,12 +111,15 @@ class DocumentService:
         )
 
     def delete_document(self, document_id: str) -> Optional[DocumentDeleteResponse]:
-        """Deletes a document from disk and storage registry."""
+        """Deletes a document from disk, vector store, and storage registry."""
         if document_id not in self._documents:
             return None
 
         doc = self._documents.pop(document_id)
         chunks = self._chunks.pop(document_id, [])
+
+        # Remove from vector store
+        self.vector_store.delete_document(document_id)
 
         # Remove file from disk
         safe_filename = f"{document_id}_{Path(doc.filename).name}"
