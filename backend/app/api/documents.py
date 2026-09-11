@@ -81,3 +81,14 @@ async def delete_document(document_id: str):
             detail=f"Document with ID '{document_id}' was not found.",
         )
     return result
+
+
+@router.post(
+    "/{document_id}/extract",
+    summary="Extract structured internship requirements (alias)",
+)
+async def extract_document_alias(document_id: str):
+    """Alias for /analysis/extract/{document_id}."""
+    from app.api.analysis import extract_document_requirements
+
+    return await extract_document_requirements(document_id)
