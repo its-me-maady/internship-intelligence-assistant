@@ -1,3 +1,4 @@
+from app.api.chat import router as chat_router
 from app.api.documents import router as documents_router
 from app.config import settings
 from app.services.vector_service import get_vector_store
@@ -24,6 +25,7 @@ app.add_middleware(
 
 # Mount API Routers
 app.include_router(documents_router, prefix="/api/v1")
+app.include_router(chat_router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["Health"])
