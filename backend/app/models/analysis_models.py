@@ -125,14 +125,28 @@ class RoadmapItem(BaseModel):
 class SkillGapAnalysisRequest(BaseModel):
     """Request schema for deterministic skill gap analysis."""
 
-    document_id: str = Field(
-        ...,
+    document_id: Optional[str] = Field(
+        default=None,
         description="ID of the ingested internship document.",
     )
     user_skills: List[str] = Field(
         default_factory=list,
         description="List of technical skills possessed by the student.",
     )
+    candidate_skills: Optional[List[str]] = Field(
+        default=None,
+        description="Alias for user_skills.",
+    )
+    extracted_requirements: Optional[JobRequirementsSchema] = Field(
+        default=None,
+        description="Pre-extracted requirements. Bypasses LLM extraction if provided.",
+    )
+
+    def get_skills(self) -> List[str]:
+        """Returns candidate skills from user_skills or candidate_skills."""
+        if self.candidate_skills is not None:
+            return self.candidate_skills
+        return self.user_skills
 
 
 class SkillGapAnalysisResponse(BaseModel):
